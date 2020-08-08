@@ -10,7 +10,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Homebody(),
     );
   }
@@ -29,13 +29,12 @@ class Homebody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Align(
-              alignment: Alignment.topCenter,
               heightFactor: 2,
               child: Text(
                 "Manage",
                 style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontSize: 35,
+                    color: Colors.black,
+                    fontSize: 45,
                     fontWeight: FontWeight.w400),
               ),
             ),

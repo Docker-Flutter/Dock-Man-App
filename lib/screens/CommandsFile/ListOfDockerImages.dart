@@ -1,3 +1,4 @@
+import 'package:dock_man/screens/Settings/settings.dart';
 import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,10 +8,12 @@ String query;
 class ListOfDockerImages extends StatelessWidget {
   AppBar appBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.red,
+      backgroundColor: Colors.red[200],
       title: Text(
         "List of Docker Image(s)",
-        style: GoogleFonts.lato(),
+        style: GoogleFonts.lato(
+          color: Colors.black,
+        ),
       ),
       centerTitle: true,
     );
@@ -18,9 +21,9 @@ class ListOfDockerImages extends StatelessWidget {
 
   BottomAppBar bottomAppBar(BuildContext context) {
     return BottomAppBar(
-      color: Colors.red,
+      color: Colors.red[200],
       shape: CircularNotchedRectangle(),
-      notchMargin: 7,
+      notchMargin: 5,
       child: new Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -41,7 +44,12 @@ class ListOfDockerImages extends StatelessWidget {
             ),
             iconSize: 28.0,
             tooltip: "Setting",
-            onPressed: () {},
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Settings(),
+              ),
+            ),
           ),
         ],
       ),
@@ -54,7 +62,7 @@ class ListOfDockerImages extends StatelessWidget {
         Icons.feedback,
         color: Colors.white,
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.red[300],
       elevation: 2,
       tooltip: "Feedback",
       onPressed: () {},

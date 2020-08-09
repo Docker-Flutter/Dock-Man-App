@@ -1,4 +1,4 @@
-import 'package:dock_man/screens/home/home.dart';
+import 'package:dock_man/screens/Welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -67,7 +67,7 @@ class Splash extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Home(),
+                    builder: (context) => WelcomeScreen(),
                   ),
                 ),
               ),

@@ -1,10 +1,20 @@
-import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dock_man/screens/Auth/auth.dart';
 
-String mail, ip, name, val;
+import 'package:firebase_database/firebase_database.dart';
 
-class Settings extends StatelessWidget {
+// ignore: non_constant_identifier_names
+final DBRef = FirebaseDatabase.instance.reference();
+
+String u_name, u_mail, u_ip, val;
+
+class Settings extends StatefulWidget {
+  @override
+  _SettingsState createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings> {
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.black,
@@ -25,60 +35,108 @@ class Settings extends StatelessWidget {
       body: SettingsBody(),
     );
   }
-}
 
-edit(context, status) {
-  Size size = MediaQuery.of(context).size;
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-        elevation: 16,
-        child: Container(
-          height: 200.0,
-          width: 380.0,
-          padding: EdgeInsets.only(left: 10, right: 10),
-          child: ListView(
-            children: <Widget>[
-              SizedBox(height: 20),
-              Center(
-                child: Text(
-                  status,
-                  style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Text(
-                "Update:",
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-              SizedBox(height: size.height * 0.02),
-              TextField(
-                onChanged: (val) {},
-                decoration: InputDecoration(
-                  labelText: status,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              FlatButton(
-                  onPressed: () {
-                    ip = val;
-                  },
-                  child: Text("Save"))
-            ],
-          ),
-        ),
+  readName() {
+    DBRef.once().then((DataSnapshot dataSnapshot) {
+      var data = dataSnapshot.value;
+      u_name = data[userId]['name'].toString();
+    });
+  }
+
+  readMail() {
+    DBRef.once().then((DataSnapshot dataSnapshot) {
+      var data = dataSnapshot.value;
+      u_mail = data[userId]['email'].toString();
+    });
+  }
+
+  readIP() {
+    DBRef.once().then((DataSnapshot dataSnapshot) {
+      var data = dataSnapshot.value;
+      u_ip = data[userId]['ip'].toString();
+    });
+  }
+
+  updateData(status, newData) {
+    if (status == "MailId") {
+      DBRef.child(userId.toString()).update(
+        {
+          'email': newData,
+        },
       );
-    },
-  );
+    } else {
+      DBRef.child(userId.toString()).update(
+        {
+          'Ip': newData,
+        },
+      );
+    }
+  }
+
+  edit(context, status) {
+    Size size = MediaQuery.of(context).size;
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+          elevation: 16,
+          child: Container(
+            height: 200.0,
+            width: 380.0,
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: ListView(
+              children: <Widget>[
+                SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Text(
+                  "Update:",
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(height: size.height * 0.02),
+                TextField(
+                  onChanged: (val) {},
+                  decoration: InputDecoration(
+                    labelText: status,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                FlatButton(
+                    onPressed: () {
+                      if (status == "MailId") {
+                        u_mail = val;
+                      } else {
+                        u_ip = val;
+                      }
+                    },
+                    child: Text("Save"))
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
-class SettingsBody extends StatelessWidget {
+class SettingsBody extends StatefulWidget {
+  @override
+  _SettingsBodyState createState() => _SettingsBodyState();
+}
+
+class _SettingsBodyState extends State<SettingsBody> {
+  _SettingsState obj = new _SettingsState();
   command(osname, nname) async {
     print(osname);
   }
@@ -86,9 +144,9 @@ class SettingsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    name = "Shivam Gupta";
-    mail = "shivamguptasg1808@gmail.com";
-    ip = "192.168.1.205";
+    obj.readName();
+    obj.readMail();
+    obj.readIP();
 
     return SafeArea(
       minimum: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
@@ -102,7 +160,7 @@ class SettingsBody extends StatelessWidget {
             ),
             SizedBox(height: size.height * 0.02),
             Text(
-              name,
+              u_name ?? "User-name",
               style: GoogleFonts.lato(
                   color: Colors.black,
                   fontSize: 25,
@@ -132,11 +190,11 @@ class SettingsBody extends StatelessWidget {
                     ),
                     child: ListTile(
                       title: Text("Mail Id:"),
-                      subtitle: Text(mail),
+                      subtitle: Text(u_mail ?? "Mail"),
                       leading: Icon(Icons.mail),
                       trailing: Icon(Icons.edit),
                       onTap: () {
-                        edit(context, "Mail Id");
+                        obj.edit(context, "MailId");
                       },
                     ),
                   ),
@@ -151,11 +209,11 @@ class SettingsBody extends StatelessWidget {
                     ),
                     child: ListTile(
                       title: Text("Docker Server IP:"),
-                      subtitle: Text(ip),
+                      subtitle: Text(u_ip ?? "IP"),
                       leading: Icon(Icons.network_check),
                       trailing: Icon(Icons.edit),
                       onTap: () {
-                        edit(context, "Docker Server IP");
+                        obj.edit(context, "Docker Server IP");
                       },
                     ),
                   ),

@@ -1,13 +1,18 @@
 import 'package:dock_man/components/already_have_an_account_acheck.dart';
 import 'package:dock_man/components/rounded_button.dart';
+import 'package:dock_man/screens/Auth/auth.dart';
 import 'package:dock_man/screens/Login/login_screen.dart';
 import 'package:dock_man/screens/Signup/components/background.dart';
 import 'package:dock_man/screens/Signup/components/or_divider.dart';
 import 'package:dock_man/screens/Signup/components/social_icon.dart';
-import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
 
 class Body extends StatelessWidget {
+  TextEditingController name = new TextEditingController();
+  TextEditingController email = new TextEditingController();
+  TextEditingController password = new TextEditingController();
+  TextEditingController ip = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -25,7 +30,7 @@ class Body extends StatelessWidget {
                   fontSize: 25,
                 ),
               ),
-              SizedBox(height: size.height * 0.03),
+              SizedBox(height: size.height * 0.01),
               Image.asset(
                 "assets/icons/dock.gif",
                 height: size.height * 0.25,
@@ -34,42 +39,50 @@ class Body extends StatelessWidget {
               TextField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: "Enter Email",
+                  labelText: "Enter Name",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
-                onChanged: (value) {},
+                controller: name,
               ),
               SizedBox(height: size.height * 0.01),
               TextField(
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: "Enter Email",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                controller: email,
+              ),
+              SizedBox(height: size.height * 0.01),
+              TextField(
+                obscureText: true,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: "Enter Password",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.lock),
                 ),
-                onChanged: (value) {},
+                controller: password,
               ),
               SizedBox(height: size.height * 0.01),
               TextField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: "Enter IP",
+                  labelText: "Enter Docker Server IP",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.network_check),
                 ),
-                onChanged: (value) {},
+                controller: ip,
               ),
               RoundedButton(
-                text: "SIGNUP",
-                press: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Home(),
-                  ),
-                ),
-              ),
-              SizedBox(height: size.height * 0.03),
+                  text: "SIGNUP",
+                  press: () => {
+                        writeData(context, name.text, email.text, password.text,
+                            ip.text)
+                      }),
+              SizedBox(height: size.height * 0.01),
               AlreadyHaveAnAccountCheck(
                 login: false,
                 press: () {

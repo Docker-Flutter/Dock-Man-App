@@ -1,12 +1,16 @@
 import 'package:dock_man/components/already_have_an_account_acheck.dart';
 import 'package:dock_man/components/rounded_button.dart';
+import 'package:dock_man/screens/Auth/auth.dart';
 import 'package:dock_man/screens/Login/components/background.dart';
 import 'package:dock_man/screens/Signup/signup_screen.dart';
-import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Body extends StatelessWidget {
-  const Body({
+  TextEditingController email = new TextEditingController();
+  TextEditingController password = new TextEditingController();
+
+  Body({
     Key key,
   }) : super(key: key);
 
@@ -40,30 +44,40 @@ class Body extends StatelessWidget {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
-                onChanged: (value) {},
+                controller: email,
               ),
               SizedBox(height: size.height * 0.01),
               Container(
                 child: Card(
                   child: TextField(
+                    obscureText: true,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       labelText: "Enter Password",
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.lock),
                     ),
-                    onChanged: (value) {},
+                    controller: password,
                   ),
                 ),
               ),
               RoundedButton(
                 text: "LOGIN",
-                press: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Home(),
-                  ),
-                ),
+                press: () => {
+                  if (email.text.length == 0 || password.text.length == 0)
+                    {
+                      Fluttertoast.showToast(
+                        msg: "Empty Field(s)",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16,
+                      )
+                    }
+                  else
+                    {loginCheck(email.text, password.text, context)}
+                },
               ),
               SizedBox(height: size.height * 0.03),
               AlreadyHaveAnAccountCheck(

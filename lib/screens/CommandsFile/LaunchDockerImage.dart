@@ -5,7 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 String osname, nickname;
 
-class LaunchDockerImage extends StatelessWidget {
+class LaunchDockerImage extends StatefulWidget {
+  @override
+  _LaunchDockerImageState createState() => _LaunchDockerImageState();
+}
+
+class _LaunchDockerImageState extends State<LaunchDockerImage> {
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.red[200],
@@ -82,82 +87,117 @@ class LaunchDockerImage extends StatelessWidget {
   }
 }
 
-class LaunchDockerImageBody extends StatelessWidget {
+class LaunchDockerImageBody extends StatefulWidget {
+  @override
+  _LaunchDockerImageBodyState createState() => _LaunchDockerImageBodyState();
+}
+
+class _LaunchDockerImageBodyState extends State<LaunchDockerImageBody> {
+  int _value = 0;
+
   command(osname, nname) async {
     print(osname);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      minimum: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(bottom: 20),
-              child: Image.asset(
-                "assets/images/dockman.png",
-                fit: BoxFit.fill,
+    return SingleChildScrollView(
+      child: SafeArea(
+        minimum: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Image.asset(
+                  "assets/images/dockman.png",
+                  fit: BoxFit.fill,
+                ),
               ),
-            ),
-            Text(
-              "Commands",
-              style: GoogleFonts.lato(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w400),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 20),
-              child: Card(
-                child: TextField(
-                  onChanged: (val) {
-                    osname = val;
+              Text(
+                "Commands",
+                style: GoogleFonts.lato(
+                    color: Colors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w400),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 20),
+                padding: EdgeInsets.all(10.0),
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all()),
+                child: DropdownButton(
+                  value: _value,
+                  isExpanded: true,
+                  items: [
+                    DropdownMenuItem(
+                      child: Text("Os Name and Version"),
+                      value: 0,
+                    ),
+                    DropdownMenuItem(
+                      child: Text("Ubuntu 18.04"),
+                      value: 1,
+                    ),
+                    DropdownMenuItem(
+                      child: Text("Centos 7"),
+                      value: 2,
+                    ),
+                    DropdownMenuItem(
+                      child: Text("httpd"),
+                      value: 3,
+                    ),
+                    DropdownMenuItem(
+                      child: Text("wordpress"),
+                      value: 4,
+                    )
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _value = value;
+                    });
                   },
-                  decoration: InputDecoration(
-                    labelText: "Name of OS",
-                    border: OutlineInputBorder(),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 10),
+                child: Card(
+                  child: TextField(
+                    onChanged: (val) {
+                      nickname = val;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Nickname for OS",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 20),
-              child: Card(
-                child: TextField(
-                  onChanged: (val) {
-                    nickname = val;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Nickname for OS",
-                    border: OutlineInputBorder(),
+              const SizedBox(height: 30),
+              RaisedButton(
+                onPressed: () {
+                  command(osname, nickname);
+                },
+                textColor: Colors.white,
+                padding: const EdgeInsets.all(0.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        Color(0xFF0D47A1),
+                        Color(0xFF1976D2),
+                        Color(0xFF42A5F5),
+                      ],
+                    ),
                   ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: const Text('Submit', style: TextStyle(fontSize: 20)),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            RaisedButton(
-              onPressed: () {
-                command(osname, nickname);
-              },
-              textColor: Colors.white,
-              padding: const EdgeInsets.all(0.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: <Color>[
-                      Color(0xFF0D47A1),
-                      Color(0xFF1976D2),
-                      Color(0xFF42A5F5),
-                    ],
-                  ),
-                ),
-                padding: const EdgeInsets.all(10.0),
-                child: const Text('Submit', style: TextStyle(fontSize: 20)),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

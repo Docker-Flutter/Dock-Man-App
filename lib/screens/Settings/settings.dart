@@ -7,7 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 // ignore: non_constant_identifier_names
 final DBRef = FirebaseDatabase.instance.reference();
 
-String u_name, u_mail, u_ip, val;
+String u_name, u_mail, u_ip, value;
 
 class Settings extends StatefulWidget {
   @override
@@ -15,6 +15,13 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  myFunMail(cmd) {
+    setState(() {
+      u_mail = cmd;
+    });
+    print(cmd);
+  }
+
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.black,
@@ -106,21 +113,22 @@ class _SettingsState extends State<Settings> {
                 ),
                 SizedBox(height: size.height * 0.02),
                 TextField(
-                  onChanged: (val) {},
+                  onChanged: (value) {},
                   decoration: InputDecoration(
                     labelText: status,
                     border: OutlineInputBorder(),
                   ),
                 ),
                 FlatButton(
-                    onPressed: () {
-                      if (status == "MailId") {
-                        u_mail = val;
-                      } else {
-                        u_ip = val;
-                      }
-                    },
-                    child: Text("Save"))
+                  onPressed: () {
+                    if (status == "MailId") {
+                      myFunMail(value);
+                    } else {
+                      u_ip = value;
+                    }
+                  },
+                  child: Text("Save"),
+                )
               ],
             ),
           ),
@@ -137,9 +145,6 @@ class SettingsBody extends StatefulWidget {
 
 class _SettingsBodyState extends State<SettingsBody> {
   _SettingsState obj = new _SettingsState();
-  command(osname, nname) async {
-    print(osname);
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -2,6 +2,7 @@ import 'package:dock_man/screens/Settings/settings.dart';
 import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 String query;
 
@@ -59,12 +60,12 @@ class ListOfDockerImages extends StatelessWidget {
   FloatingActionButton floatingActionButton() {
     return FloatingActionButton(
       child: const Icon(
-        Icons.feedback,
+        Icons.refresh,
         color: Colors.white,
       ),
       backgroundColor: Colors.red[300],
       elevation: 2,
-      tooltip: "Feedback",
+      tooltip: "Refresh",
       onPressed: () {},
     );
   }
@@ -82,14 +83,29 @@ class ListOfDockerImages extends StatelessWidget {
   }
 }
 
-class ListOfDockerImagesBody extends StatelessWidget {
-  command(cmd) async {
-    print(cmd);
+class ListOfDockerImagesBody extends StatefulWidget {
+  @override
+  _ListOfDockerImagesBodyState createState() => _ListOfDockerImagesBodyState();
+}
+
+class _ListOfDockerImagesBodyState extends State<ListOfDockerImagesBody> {
+  var cmd;
+  var webdata;
+
+  myweb(cmd) async {
+    var url = "http://192.168.0.106/cgi-bin/web.py?x=${cmd}";
+    var r = await http.get(url);
+
+    setState(() {
+      webdata = r.body;
+    });
+    print(webdata);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return SingleChildScrollView(
+        child: SafeArea(
       minimum: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
       child: Container(
         child: Column(
@@ -108,10 +124,10 @@ class ListOfDockerImagesBody extends StatelessWidget {
                   fontSize: 25,
                   fontWeight: FontWeight.w400),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
             RaisedButton(
               onPressed: () {
-                command(query);
+                myweb("docker images");
               },
               textColor: Colors.white,
               padding: const EdgeInsets.all(0.0),
@@ -126,12 +142,27 @@ class ListOfDockerImagesBody extends StatelessWidget {
                   ),
                 ),
                 padding: const EdgeInsets.all(10.0),
-                child: const Text('Show List', style: TextStyle(fontSize: 20)),
+                child: const Text('Show List', style: TextStyle(fontSize: 10)),
               ),
             ),
+            const SizedBox(height: 15),
+            Container(
+              padding: EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                color: Colors.red[100],
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              child: Text(
+                webdata ?? "Output",
+                style: TextStyle(
+                  fontSize: 11,
+                ),
+              ),
+            )
           ],
         ),
       ),
-    );
+    ));
   }
 }

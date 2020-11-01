@@ -1,4 +1,3 @@
-import 'package:custom_switch/custom_switch.dart';
 import 'package:dock_man/screens/Auth/get_ip.dart';
 import 'package:dock_man/screens/Settings/settings.dart';
 import 'package:dock_man/screens/home/home.dart';
@@ -6,20 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
+String osname, nickname, cmd;
+
 String query;
+
+// ignore: non_constant_identifier_names
 String IP_Value;
 
-class RunningContainer extends StatefulWidget {
+class RemoveImage extends StatefulWidget {
   @override
-  _RunningContainerState createState() => _RunningContainerState();
+  _RemoveImageState createState() => _RemoveImageState();
 }
 
-class _RunningContainerState extends State<RunningContainer> {
+class _RemoveImageState extends State<RemoveImage> {
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.red[200],
       title: Text(
-        "Show Running Container(s)",
+        "Remove a Image",
         style: GoogleFonts.lato(
           color: Colors.black,
         ),
@@ -83,7 +86,7 @@ class _RunningContainerState extends State<RunningContainer> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: appBar(context),
-      body: RunningContainerBody(),
+      body: RemoveContainerBody(),
       floatingActionButton: floatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: bottomAppBar(context),
@@ -91,23 +94,22 @@ class _RunningContainerState extends State<RunningContainer> {
   }
 }
 
-class RunningContainerBody extends StatefulWidget {
+class RemoveContainerBody extends StatefulWidget {
   @override
-  _RunningContainerBodyState createState() => _RunningContainerBodyState();
+  _RemoveContainerBodyState createState() => _RemoveContainerBodyState();
 }
 
-class _RunningContainerBodyState extends State<RunningContainerBody> {
-  var cmd;
-  var webdata;
-  var status = false;
+class _RemoveContainerBodyState extends State<RemoveContainerBody> {
+  String data;
 
   myweb(cmd) async {
     IP_Value = readIPUser();
+    cmd = "docker rmi -f $cmd";
     var url = "http://$IP_Value/cgi-bin/web.py?x=${cmd}";
     var r = await http.get(url);
-
+    print(r.body);
     setState(() {
-      webdata = r.body;
+      data = r.body;
     });
   }
 
@@ -133,36 +135,24 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
                     fontSize: 25,
                     fontWeight: FontWeight.w400),
               ),
-              const SizedBox(height: 10),
-              Row(
-                children: <Widget>[
-                  const SizedBox(width: 10),
-                  Text(
-                    "Detailed: ",
-                    style: TextStyle(
-                      fontSize: 25,
+              Container(
+                padding: EdgeInsets.only(top: 20),
+                child: Card(
+                  child: TextField(
+                    onChanged: (val) {
+                      query = val;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Name of Container to delete",
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(width: 170),
-                  CustomSwitch(
-                    activeColor: Colors.pinkAccent,
-                    value: status,
-                    onChanged: (value) {
-                      print("VALUE : $value");
-                      setState(() {
-                        status = value;
-                      });
-                    },
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
               RaisedButton(
                 onPressed: () {
-                  if (status == true)
-                    myweb("docker ps -a");
-                  else
-                    myweb("docker ps");
+                  myweb(query);
                 },
                 textColor: Colors.white,
                 padding: const EdgeInsets.all(0.0),
@@ -177,11 +167,10 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
                     ),
                   ),
                   padding: const EdgeInsets.all(10.0),
-                  child:
-                      const Text('Show list', style: TextStyle(fontSize: 20)),
+                  child: const Text('Submit', style: TextStyle(fontSize: 20)),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               Container(
                 padding: EdgeInsets.all(5.0),
                 decoration: BoxDecoration(
@@ -190,12 +179,12 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 child: Text(
-                  webdata ?? "Output",
+                  data ?? "Output",
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 15,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

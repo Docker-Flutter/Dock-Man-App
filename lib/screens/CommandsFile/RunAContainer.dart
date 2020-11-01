@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 String query;
+String IP_Value;
 
 class RunAContainer extends StatelessWidget {
   AppBar appBar(BuildContext context) {

@@ -1,11 +1,21 @@
+import 'package:dock_man/screens/Auth/get_ip.dart';
 import 'package:dock_man/screens/Settings/settings.dart';
 import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+
+String osname, nickname, cmd;
 
 String query;
+String IP_Value;
 
-class RemoveContainer extends StatelessWidget {
+class RemoveContainer extends StatefulWidget {
+  @override
+  _RemoveContainerState createState() => _RemoveContainerState();
+}
+
+class _RemoveContainerState extends State<RemoveContainer> {
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.red[200],
@@ -82,68 +92,99 @@ class RemoveContainer extends StatelessWidget {
   }
 }
 
-class RemoveContainerBody extends StatelessWidget {
-  command(cmd) async {
-    print(cmd);
+class RemoveContainerBody extends StatefulWidget {
+  @override
+  _RemoveContainerBodyState createState() => _RemoveContainerBodyState();
+}
+
+class _RemoveContainerBodyState extends State<RemoveContainerBody> {
+  String data;
+
+  myweb(cmd) async {
+    IP_Value = readIPUser();
+    cmd = "docker rm -f $cmd";
+    var url = "http://$IP_Value/cgi-bin/web.py?x=${cmd}";
+    var r = await http.get(url);
+    print(r.body);
+    setState(() {
+      data = "Container Deleted";
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      minimum: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(bottom: 20),
-              child: Image.asset(
-                "assets/images/dockman.png",
-                fit: BoxFit.fill,
+    return SingleChildScrollView(
+      child: SafeArea(
+        minimum: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Image.asset(
+                  "assets/images/dockman.png",
+                  fit: BoxFit.fill,
+                ),
               ),
-            ),
-            Text(
-              "Commands",
-              style: GoogleFonts.lato(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w400),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 20),
-              child: Card(
-                child: TextField(
-                  onChanged: (val) {
-                    query = val;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Name of Container",
-                    border: OutlineInputBorder(),
+              Text(
+                "Commands",
+                style: GoogleFonts.lato(
+                    color: Colors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w400),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 20),
+                child: Card(
+                  child: TextField(
+                    onChanged: (val) {
+                      query = val;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Name of Container to delete",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            RaisedButton(
-              onPressed: () {
-                command(query);
-              },
-              textColor: Colors.white,
-              padding: const EdgeInsets.all(0.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: <Color>[
-                      Color(0xFF0D47A1),
-                      Color(0xFF1976D2),
-                      Color(0xFF42A5F5),
-                    ],
+              const SizedBox(height: 30),
+              RaisedButton(
+                onPressed: () {
+                  myweb(query);
+                },
+                textColor: Colors.white,
+                padding: const EdgeInsets.all(0.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        Color(0xFF0D47A1),
+                        Color(0xFF1976D2),
+                        Color(0xFF42A5F5),
+                      ],
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: const Text('Submit', style: TextStyle(fontSize: 20)),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                  color: Colors.red[100],
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                child: Text(
+                  data ?? "Output",
+                  style: TextStyle(
+                    fontSize: 15,
                   ),
                 ),
-                padding: const EdgeInsets.all(10.0),
-                child: const Text('Submit', style: TextStyle(fontSize: 20)),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

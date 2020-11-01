@@ -1,9 +1,13 @@
+import 'package:custom_switch/custom_switch.dart';
+import 'package:dock_man/screens/Auth/get_ip.dart';
 import 'package:dock_man/screens/Settings/settings.dart';
 import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
-String osname, nickname;
+String osname, nickname, cmd;
+String IP_Value;
 
 class LaunchDockerImage extends StatefulWidget {
   @override
@@ -94,9 +98,43 @@ class LaunchDockerImageBody extends StatefulWidget {
 
 class _LaunchDockerImageBodyState extends State<LaunchDockerImageBody> {
   int _value = 0;
+  bool status_i = false, status_t = false, status_d = false;
+  String data = "Output", version;
 
-  command(osname, nname) async {
-    print(osname);
+  myweb(cmd) async {
+    IP_Value = readIPUser();
+    var url = "http://$IP_Value/cgi-bin/web.py?x=${cmd}";
+    var r = await http.get(url);
+    print(r.body);
+    setState(() {
+      data = "Container Launched";
+    });
+  }
+
+  os() {
+    if (_value == 1) {
+      version = "ubuntu:latest";
+    } else if (_value == 2) {
+      version = "centos:7";
+    } else if (_value == 3) {
+      version = "httpd:latest";
+    } else if (_value == 4) {
+      version = "wordpress:5.1.1-php7.3-apache";
+    }
+  }
+
+  process() {
+    os();
+    if (status_i == true && status_t == true && status_d == true) {
+      cmd = "docker run -dit --name $nickname $version";
+    } else if (status_i == true && status_t == true && status_d == false) {
+      cmd = "docker run -it --name $nickname $version";
+    } else if (status_i == true && status_t == false && status_d == true) {
+      cmd = "docker run -di --name $nickname $version";
+    } else {
+      cmd = "docker run -dit --name $nickname $version";
+    }
+    print("nickname: $nickname , version: $version");
   }
 
   @override
@@ -157,6 +195,7 @@ class _LaunchDockerImageBodyState extends State<LaunchDockerImageBody> {
                   onChanged: (value) {
                     setState(() {
                       _value = value;
+                      os();
                     });
                   },
                 ),
@@ -175,10 +214,80 @@ class _LaunchDockerImageBodyState extends State<LaunchDockerImageBody> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
+              Row(
+                children: <Widget>[
+                  const SizedBox(width: 10),
+                  Text(
+                    "Interactive: ",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  const SizedBox(width: 170),
+                  CustomSwitch(
+                    activeColor: Colors.pinkAccent,
+                    value: status_i,
+                    onChanged: (value) {
+                      print("VALUE : $value");
+                      setState(() {
+                        status_i = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: <Widget>[
+                  const SizedBox(width: 10),
+                  Text(
+                    "Terminal: ",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  const SizedBox(width: 190),
+                  CustomSwitch(
+                    activeColor: Colors.pinkAccent,
+                    value: status_t,
+                    onChanged: (value) {
+                      print("VALUE : $value");
+                      setState(() {
+                        status_t = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: <Widget>[
+                  const SizedBox(width: 10),
+                  Text(
+                    "Move to Backgroud: ",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  const SizedBox(width: 70),
+                  CustomSwitch(
+                    activeColor: Colors.pinkAccent,
+                    value: status_d,
+                    onChanged: (value) {
+                      print("VALUE : $value");
+                      setState(() {
+                        status_d = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
               RaisedButton(
                 onPressed: () {
-                  command(osname, nickname);
+                  process();
+                  myweb(cmd);
                 },
                 textColor: Colors.white,
                 padding: const EdgeInsets.all(0.0),
@@ -196,6 +305,21 @@ class _LaunchDockerImageBodyState extends State<LaunchDockerImageBody> {
                   child: const Text('Submit', style: TextStyle(fontSize: 20)),
                 ),
               ),
+              const SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                  color: Colors.red[100],
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                child: Text(
+                  data ?? "Output",
+                  style: TextStyle(
+                    fontSize: 11,
+                  ),
+                ),
+              )
             ],
           ),
         ),

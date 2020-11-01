@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-String query;
+String osname, nickname, cmd;
 String IP_Value;
 
-class RunningContainer extends StatefulWidget {
+class DetailsContainer extends StatefulWidget {
   @override
-  _RunningContainerState createState() => _RunningContainerState();
+  _DetailsContainerState createState() => _DetailsContainerState();
 }
 
-class _RunningContainerState extends State<RunningContainer> {
+class _DetailsContainerState extends State<DetailsContainer> {
   AppBar appBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.red[200],
       title: Text(
-        "Show Running Container(s)",
+        "Details of a Container",
         style: GoogleFonts.lato(
           color: Colors.black,
         ),
@@ -44,7 +44,7 @@ class _RunningContainerState extends State<RunningContainer> {
             ),
             iconSize: 28.0,
             tooltip: "Home",
-            onPressed: () => Homebody(),
+            onPressed: () => Home(),
           ),
           IconButton(
             icon: Icon(
@@ -83,7 +83,7 @@ class _RunningContainerState extends State<RunningContainer> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: appBar(context),
-      body: RunningContainerBody(),
+      body: LaunchDockerImageBody(),
       floatingActionButton: floatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: bottomAppBar(context),
@@ -91,23 +91,23 @@ class _RunningContainerState extends State<RunningContainer> {
   }
 }
 
-class RunningContainerBody extends StatefulWidget {
+class LaunchDockerImageBody extends StatefulWidget {
   @override
-  _RunningContainerBodyState createState() => _RunningContainerBodyState();
+  _LaunchDockerImageBodyState createState() => _LaunchDockerImageBodyState();
 }
 
-class _RunningContainerBodyState extends State<RunningContainerBody> {
-  var cmd;
-  var webdata;
-  var status = false;
+class _LaunchDockerImageBodyState extends State<LaunchDockerImageBody> {
+  bool status = false;
+  String data = "Output", version;
 
   myweb(cmd) async {
     IP_Value = readIPUser();
+    cmd = "docker inspect $cmd";
     var url = "http://$IP_Value/cgi-bin/web.py?x=${cmd}";
     var r = await http.get(url);
-
+    print(r.body);
     setState(() {
-      webdata = r.body;
+      data = r.body;
     });
   }
 
@@ -133,14 +133,28 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
                     fontSize: 25,
                     fontWeight: FontWeight.w400),
               ),
+              Container(
+                padding: EdgeInsets.only(top: 10),
+                child: Card(
+                  child: TextField(
+                    onChanged: (val) {
+                      nickname = val;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Nickname for OS",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 10),
               Row(
                 children: <Widget>[
                   const SizedBox(width: 10),
                   Text(
-                    "Detailed: ",
+                    "Only Ip: ",
                     style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 20,
                     ),
                   ),
                   const SizedBox(width: 170),
@@ -159,10 +173,10 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
               const SizedBox(height: 10),
               RaisedButton(
                 onPressed: () {
-                  if (status == true)
-                    myweb("docker ps -a");
+                  if (status == false)
+                    myweb(nickname);
                   else
-                    myweb("docker ps");
+                    myweb("$nickname | grep IP");
                 },
                 textColor: Colors.white,
                 padding: const EdgeInsets.all(0.0),
@@ -177,11 +191,10 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
                     ),
                   ),
                   padding: const EdgeInsets.all(10.0),
-                  child:
-                      const Text('Show list', style: TextStyle(fontSize: 20)),
+                  child: const Text('Submit', style: TextStyle(fontSize: 20)),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               Container(
                 padding: EdgeInsets.all(5.0),
                 decoration: BoxDecoration(
@@ -190,7 +203,7 @@ class _RunningContainerBodyState extends State<RunningContainerBody> {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 child: Text(
-                  webdata ?? "Output",
+                  data ?? "Output",
                   style: TextStyle(
                     fontSize: 11,
                   ),

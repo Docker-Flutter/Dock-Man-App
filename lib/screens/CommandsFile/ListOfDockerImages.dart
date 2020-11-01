@@ -1,3 +1,4 @@
+import 'package:dock_man/screens/Auth/get_ip.dart';
 import 'package:dock_man/screens/Settings/settings.dart';
 import 'package:dock_man/screens/home/home.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 String query;
+String IP_Value;
 
 class ListOfDockerImages extends StatelessWidget {
   AppBar appBar(BuildContext context) {
@@ -93,13 +95,12 @@ class _ListOfDockerImagesBodyState extends State<ListOfDockerImagesBody> {
   var webdata;
 
   myweb(cmd) async {
-    var url = "http://192.168.0.106/cgi-bin/web.py?x=${cmd}";
+    IP_Value = readIPUser();
+    var url = "http://$IP_Value/cgi-bin/web.py?x=${cmd}";
     var r = await http.get(url);
-
     setState(() {
       webdata = r.body;
     });
-    print(webdata);
   }
 
   @override
@@ -127,6 +128,7 @@ class _ListOfDockerImagesBodyState extends State<ListOfDockerImagesBody> {
             const SizedBox(height: 10),
             RaisedButton(
               onPressed: () {
+                print("Ip : $IP_Value");
                 myweb("docker images");
               },
               textColor: Colors.white,
